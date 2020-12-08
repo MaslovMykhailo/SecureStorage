@@ -2,16 +2,31 @@ package com.mm.securestorage.validator;
 
 import com.mm.securestorage.model.User;
 import com.mm.securestorage.service.user.UserService;
-import com.nulabinc.zxcvbn.Strength;
 import com.nulabinc.zxcvbn.Zxcvbn;
+import org.passay.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import java.util.Arrays;
+
 @Component
 public class UserValidator implements Validator {
+
+    private final PasswordValidator validator = new PasswordValidator(
+        Arrays.asList(
+            new LengthRule(8, 64),
+            new UppercaseCharacterRule(1),
+            new DigitCharacterRule(1),
+            new SpecialCharacterRule(1),
+            new NumericalSequenceRule(5, false),
+            new AlphabeticalSequenceRule(5, false),
+            new QwertySequenceRule(3, false),
+            new WhitespaceRule()
+        )
+    );
 
     private final Zxcvbn passwordStrengthMeasurer = new Zxcvbn();
 
@@ -36,17 +51,15 @@ public class UserValidator implements Validator {
         }
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "NotEmpty");
-        if (user.getPassword().length() < 8 || user.getPassword().length() > 64) {
-            errors.rejectValue("password", "Size.userForm.password");
+        if (!validator.validate(new PasswordData(user.getPassword())).isValid()) {
+            errors.rejectValue("password", "Pattern.userForm.password");
+        }
+        if (passwordStrengthMeasurer.measure(user.getPassword()).getScore() < 3) {
+            errors.rejectValue("password", "Strength.userForm.password");
         }
 
         if (!user.getPasswordConfirm().equals(user.getPassword())) {
             errors.rejectValue("passwordConfirm", "Diff.userForm.passwordConfirm");
-        }
-
-        Strength strength = passwordStrengthMeasurer.measure(user.getPassword());
-        if (strength.getScore() < 3) {
-            errors.rejectValue("password", "Strength.userForm.password");
         }
     }
 
