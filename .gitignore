@@ -1,8 +1,10 @@
 target/
+config/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-config/
+
+docker-compose.yml
 
 ### STS ###
 .apt_generated
