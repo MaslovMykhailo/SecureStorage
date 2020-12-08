@@ -7,7 +7,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Create an account</title>
+    <title>Home</title>
     <link href="${contextPath}/resources/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
