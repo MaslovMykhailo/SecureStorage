@@ -26,6 +26,10 @@ public class UserController {
 
     @GetMapping("/registration")
     public String registration(Model model) {
+        if (securityService.isAuthenticated()) {
+            return "redirect:/";
+        }
+
         model.addAttribute("userForm", new User());
 
         return "registration";
@@ -43,23 +47,29 @@ public class UserController {
 
         securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
 
-        return "redirect:/welcome";
+        return "redirect:/home";
     }
 
     @GetMapping("/login")
     public String login(Model model, String error, String logout) {
-        if (error != null)
-            model.addAttribute("error", "Your username and password is invalid.");
+        if (securityService.isAuthenticated()) {
+            return "redirect:/";
+        }
 
-        if (logout != null)
+        if (error != null) {
+            model.addAttribute("error", "Your username and password is invalid.");
+        }
+
+        if (logout != null) {
             model.addAttribute("message", "You have been logged out successfully.");
+        }
 
         return "login";
     }
 
-    @GetMapping({"/", "/welcome"})
+    @GetMapping({"/", "/home"})
     public String welcome(Model model) {
-        return "welcome";
+        return "home";
     }
 
 }
