@@ -17,6 +17,9 @@ public class User {
     @Transient
     private String passwordConfirm;
 
+    @Column(length = 5120)
+    private String sensitiveData;
+
     public Long getId() {
         return id;
     }
@@ -47,6 +50,14 @@ public class User {
 
     public void setPasswordConfirm(String passwordConfirm) {
         this.passwordConfirm = passwordConfirm;
+    }
+
+    public String getSensitiveData() {
+        return sensitiveData;
+    }
+
+    public void setSensitiveData(String sensitiveData) {
+        this.sensitiveData = sensitiveData;
     }
 
 }

@@ -4,7 +4,8 @@ body {
     background-color: #eee;
 }
 
-.form-signin {
+.form-signin,
+.form-data {
     max-width: 330px;
     padding: 15px;
     margin: 0 auto;
@@ -19,7 +20,8 @@ body {
     font-weight: normal;
 }
 
-.form-signin .form-control {
+.form-signin .form-control,
+.form-data .form-control {
     position: relative;
     height: auto;
     -webkit-box-sizing: border-box;
@@ -39,7 +41,8 @@ body {
     border-bottom-left-radius: 0;
 }
 
-.form-signin button {
+.form-signin button,
+.form-data button {
     margin-top: 10px;
 }
 

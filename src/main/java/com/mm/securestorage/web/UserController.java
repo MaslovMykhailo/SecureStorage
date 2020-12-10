@@ -43,8 +43,8 @@ public class UserController {
             return "registration";
         }
 
+        securityService.hashUserPassword(userForm);
         userService.save(userForm);
-
         securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
 
         return "redirect:/home";
@@ -68,7 +68,38 @@ public class UserController {
     }
 
     @GetMapping({"/", "/home"})
-    public String welcome(Model model) {
+    public String home(@ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
+        if (!securityService.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        try {
+            String username = securityService.getwAuthenticatedUsername();
+            User user = userService.findByUsername(username);
+
+            String sensitiveData = securityService.getUserSensitiveData(user);
+            userForm.setSensitiveData(sensitiveData);
+        } catch (IllegalStateException error) {
+            bindingResult.rejectValue("sensitiveData", "Illegal.userForm.sensitiveData");
+        }
+
+        return "home";
+    }
+
+    @PostMapping({"/", "/home"})
+    public String home(@ModelAttribute("userForm") User userForm) {
+        if (!securityService.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        String username = securityService.getAuthenticatedUsername();
+        User user = userService.findByUsername(username);
+
+        String sensitiveData = userForm.getSensitiveData();
+        securityService.setUserSensitiveData(user, sensitiveData);
+
+        userService.save(user);
+
         return "home";
     }
 

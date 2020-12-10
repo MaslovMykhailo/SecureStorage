@@ -5,6 +5,7 @@ config/
 !**/src/test/**/target/
 
 docker-compose.yml
+.env
 
 ### STS ###
 .apt_generated
