@@ -1,11 +1,9 @@
 package com.mm.securestorage.service.security;
 
-import com.amazonaws.encryptionsdk.AwsCrypto;
-import com.amazonaws.encryptionsdk.CryptoAlgorithm;
-import com.amazonaws.encryptionsdk.CryptoResult;
-import com.amazonaws.encryptionsdk.kms.KmsMasterKey;
-import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.mm.securestorage.model.User;
+import com.mm.securestorage.service.security.crypto.AesCrypto;
+import com.mm.securestorage.service.security.crypto.AwsKmsCrypto;
+import com.mm.securestorage.service.security.crypto.EnvelopeCrypto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,34 +86,20 @@ public class SecurityServiceImpl implements SecurityService {
     @Value("${aws.kms.arn}")
     private String AWS_KMS_ARN;
 
-    private final AwsCrypto crypto = AwsCrypto
-        .builder()
-        .withEncryptionAlgorithm(CryptoAlgorithm.ALG_AES_256_GCM_HKDF_SHA512_COMMIT_KEY)
-        .build();
-
-    public CryptoResult<byte[], KmsMasterKey> encrypt(byte[] data) {
-        KmsMasterKeyProvider keyProvider = KmsMasterKeyProvider.builder().buildStrict(AWS_KMS_ARN);
-        return crypto.encryptData(keyProvider, data);
-    }
-
-    public CryptoResult<byte[], KmsMasterKey> decrypt(byte[] data) {
-        KmsMasterKeyProvider keyProvider = KmsMasterKeyProvider.builder().buildStrict(AWS_KMS_ARN);
-        return crypto.decryptData(keyProvider, data);
-    }
-
     @Override
     public String getUserSensitiveData(User user) {
         String encryptedData = user.getSensitiveData();
 
         if (encryptedData != null) {
             byte[] encodedData = Base64.getDecoder().decode(encryptedData);
-            CryptoResult<byte[], KmsMasterKey> result = decrypt(encodedData);
 
-            if (!result.getMasterKeyIds().get(0).equals(AWS_KMS_ARN)) {
-                throw new IllegalStateException("Wrong Key Id!");
-            }
+            EnvelopeCrypto crypto = new EnvelopeCrypto(
+                new AesCrypto(),
+                new AwsKmsCrypto(AWS_KMS_ARN)
+            );
 
-            return new String(result.getResult());
+            byte[] decryptedData = crypto.decrypt(encodedData);
+            return new String(decryptedData);
         }
 
         return null;
@@ -124,8 +108,13 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public void setUserSensitiveData(User user, String data) {
         if (data != null) {
-            CryptoResult<byte[], KmsMasterKey> result = encrypt(data.getBytes());
-            String encodedData = Base64.getEncoder().encodeToString(result.getResult());
+            EnvelopeCrypto crypto = new EnvelopeCrypto(
+                new AesCrypto(),
+                new AwsKmsCrypto(AWS_KMS_ARN)
+            );
+
+            byte[] encryptedData = crypto.encrypt(data.getBytes());
+            String encodedData = Base64.getEncoder().encodeToString(encryptedData);
 
             user.setSensitiveData(encodedData);
         }

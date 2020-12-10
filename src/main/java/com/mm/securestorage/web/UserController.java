@@ -74,13 +74,13 @@ public class UserController {
         }
 
         try {
-            String username = securityService.getwAuthenticatedUsername();
+            String username = securityService.getAuthenticatedUsername();
             User user = userService.findByUsername(username);
 
             String sensitiveData = securityService.getUserSensitiveData(user);
             userForm.setSensitiveData(sensitiveData);
-        } catch (IllegalStateException error) {
-            bindingResult.rejectValue("sensitiveData", "Illegal.userForm.sensitiveData");
+        } catch (Throwable error) {
+            bindingResult.rejectValue("sensitiveData", "Fail.userForm.sensitiveData");
         }
 
         return "home";
