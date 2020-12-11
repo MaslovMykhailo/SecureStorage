@@ -66,6 +66,11 @@ Simple web application with client authentication which allows storing sensitive
 - SQL injections prevented because sensitive data stored in encrypted and encoded form
 - Session hijacking also prevented for not compromised users by using two keys for encryption data and key, because each user sensitive data encrypted by the unique key, which is also encrypted
 
+### Not prevented attack vectors
+
+- Stealing AWS KMS credentials and key id which allows to decrypt any data encryption key
+- OS penetration and stealing database credentials
+
 #### Resources
 
 - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#cryptographic-storage-cheat-sheet
