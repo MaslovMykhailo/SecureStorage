@@ -1,0 +1,36 @@
+version: '3'
+services:
+  secure-storage-mysql:
+    container_name: secure-storage-mysql
+    image: mysql/mysql-server:8.0
+    environment:
+      MYSQL_DATABASE: securestorage
+      MYSQL_ROOT_PASSWORD: securestorage-mysql-password
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+    restart: always
+
+  secure-storage:
+    container_name: secure-storage
+    build: ""
+    environment:
+      MYSQL_DATABASE_URL: jdbc:mysql://secure-storage-mysql:3306/securestorage
+      MYSQL_DATABASE_USERNAME: root
+      MYSQL_ROOT_PASSWORD: securestorage-mysql-password
+      AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+      AWS_KMS_ARN: arn:aws:kms:RGIEON:AWS_KMS_ARN
+      KEY_STORE_P12: ./.cert/secure-storage.p12
+      KEY_STORE_PASS: key-store-password
+      KEY_ALIAS: secure-storage-cert
+      KEY_PASS: key-password
+    volumes:
+      - .:/app
+      - ~/.m2:/root/.m2
+    working_dir: /app
+    ports:
+      - "8443:8443"
+    command: mvn clean spring-boot:run
+    depends_on:
+      - secure-storage-mysql

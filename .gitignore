@@ -6,6 +6,7 @@ config/
 
 docker-compose.yml
 .env
+.cert
 
 ### STS ###
 .apt_generated

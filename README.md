@@ -7,6 +7,7 @@ Simple web application with client authentication which allows storing sensitive
 - Application was implemented using [Spring Boot Framework](https://spring.io/projects/spring-boot)
 - As data storage was chosen MySQL database
 - Web server and database are running in Docker containers
+- HTTPS is used for application parts communication
 
 ## lab 5 report
 
@@ -74,3 +75,12 @@ Simple web application with client authentication which allows storing sensitive
 #### Resources
 
 - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#cryptographic-storage-cheat-sheet
+
+## lab 7 report
+
+Script which is generating key storages, certificates and self-signing the certificate can be found in `local-cert.sh` 
+
+- *keytool* util is used for key stores and certificates generation
+- RSA 2048 cipher was chosen
+- TLSv1.3 is used for the server
+- PKCS12 was chosen for key storage 
