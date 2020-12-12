@@ -80,7 +80,13 @@ Simple web application with client authentication which allows storing sensitive
 
 Script which is generating key storages, certificates and self-signing the certificate can be found in `local-cert.sh` 
 
+### Tools and technologies
+
 - *keytool* util is used for key stores and certificates generation
 - RSA 2048 cipher was chosen
 - TLSv1.3 is used for the server
 - PKCS12 was chosen for key storage 
+
+### Resources
+
+- https://cheatsheetseries.owasp.org/cheatsheets/TLS_Cipher_String_Cheat_Sheet.html#tls-cipher-string-cheat-sheet
